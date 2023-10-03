@@ -1,0 +1,73 @@
+```{r}
+library(tidyverse)
+```
+```{r}
+three_die_rolls <- 
+  tibble::tibble(
+    Die_1 = sample(x = 1:6, size = 1000000, replace = TRUE),
+    Die_2 = sample(x = 1:6, size = 1000000, replace = TRUE),
+    Die_3 = sample(x = 1:6, size = 1000000, replace = TRUE)
+)
+```
+
+
+```{r}
+result <- three_die_rolls %>% 
+  mutate(Sum = Die_1 + Die_2 + Die_3) %>% 
+  # filter(Sum %in% 9:10) %>% 
+  group_by(Sum) %>% 
+  summarise(Count = n()) %>% 
+  mutate(Prob = Count/sum(Count)) %>% 
+  arrange(desc(Count))
+
+```
+
+
+```{r}
+result %>% 
+  ggplot2::ggplot(aes(x = Sum, y = Count)) +
+  geom_col(width = 0.05, aes(color = Sum %in% c(9, 10)))
+```
+
+
+```{r}
+long_run_prob_coin <- 
+  tibble::tibble(
+    Flip_number = 1:1000000,
+    Toss_result = sample(c("H", "T"), 1000000, replace = TRUE),
+    Head_1 = ifelse(Toss_result == "H", 1, 0),
+    Running_Total_of_Head = cumsum(Head_1),
+  )
+```
+
+
+```{r}
+graph <- long_run_prob_coin %>% 
+  mutate(longprob = dplyr::cummean(Head_1)) %>% 
+  filter(Flip_number <= 5000) %>% 
+  ggplot2::ggplot(aes(x = Flip_number, y = longprob)) +
+  geom_point(color = "grey") +
+  geom_line(color = "blue") +
+  ylim(c(0,1)) +
+  geom_hline(yintercept = 0.5, linetype = "dashed") +
+  theme_minimal() 
+  
+graph %>% plotly::ggplotly()
+```
+
+
+
+```{r}
+graph_cum <- long_run_prob_coin %>% 
+  mutate(longprob = dplyr::cummean(Head_1)) %>% 
+  filter(Flip_number <= 5000) %>% 
+  ggplot2::ggplot(aes(x = Flip_number, y = Running_Total_of_Head)) +
+  geom_point(color = "grey") +
+  geom_line(color = "blue") +
+  # ylim(c(0,1)) +
+  geom_hline(yintercept = 0.5, linetype = "dashed") +
+  theme_minimal() 
+  
+graph_cum %>% plotly::ggplotly()
+```
+
