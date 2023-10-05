@@ -71,3 +71,24 @@ graph_cum <- long_run_prob_coin %>%
 graph_cum %>% plotly::ggplotly()
 ```
 
+```{r}
+
+eff_int <- 0.05
+nominal_table <- 
+tibble::tibble(
+  p = seq(0.01, 1000, 0.01),
+  nominal = p * ((1+eff_int)^(1/p)-1),
+  exp_force_int = exp(nominal)
+)
+
+  plotly::ggplotly(
+nominal_table %>% 
+  filter(p >= 0.1) %>% 
+  # ggplot2::ggplot(aes(x = p, y = nominal)) +
+  ggplot2::ggplot(aes(x = p, y = exp_force_int)) +
+  geom_line() +
+  # geom_hline(yintercept = log(1+eff_int), linetype="dashed", color = "red") +
+  theme_minimal()
+  )
+```
+
